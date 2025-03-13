@@ -88,9 +88,21 @@ class Program
     }
 }
 
+class Entry
+{
+    public DateTime Date { get; set; }
+    public string Prompt { get; set; }
+    public string Response { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Date} - {Prompt} - {Response}";
+    }
+}
+
 class Journal
 {
-    private List<string> entries = new List<string>();
+    private List<Entry> entries = new List<Entry>();
     private List<string> prompts = new List<string>
     {
         "Who was the most interesting person I interacted with today?",
@@ -106,14 +118,14 @@ class Journal
         string prompt = prompts[random.Next(prompts.Count)];
         Console.WriteLine($"\n{prompt}");
         string response = Console.ReadLine();
-        entries.Add($"{DateTime.Now}|{prompt}|{response}"); // Changed to use '|' as a delimiter
+        entries.Add(new Entry { Date = DateTime.Now, Prompt = prompt, Response = response });
     }
 
     public void DisplayEntries()
     {
         Console.WriteLine("\nJournal Entries:");
         foreach (var entry in entries)
-            Console.WriteLine(entry.Replace("|", " - ")); // Displaying formatted entries
+            Console.WriteLine(entry.ToString());
     }
 
     public void SaveToFile(string filename)
@@ -122,7 +134,7 @@ class Journal
         {
             foreach (var entry in entries)
             {
-                writer.WriteLine(entry);
+                writer.WriteLine($"{entry.Date}|{entry.Prompt}|{entry.Response}");
             }
         }
         Console.WriteLine("Journal saved.");
@@ -132,7 +144,15 @@ class Journal
     {
         if (File.Exists(filename))
         {
-            entries = new List<string>(File.ReadAllLines(filename));
+            entries.Clear();
+            foreach (var line in File.ReadAllLines(filename))
+            {
+                var parts = line.Split('|');
+                if (parts.Length == 3)
+                {
+                    entries.Add(new Entry { Date = DateTime.Parse(parts[0]), Prompt = parts[1], Response = parts[2] });
+                }
+            }
             Console.WriteLine("Journal loaded.");
         }
         else
