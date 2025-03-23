@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using System.IO;
 
 class Program
@@ -8,25 +9,36 @@ class Program
     static void Main()
     {
         Scripture scripture = new Scripture(new Reference("Proverbs", 3, 5, 6), "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.");
-        
+        int score = 0;
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         while (true)
         {
             while (!scripture.IsCompletelyHidden())
             {
                 Console.Clear();
                 Console.WriteLine(scripture.GetDisplayText());
+                Console.WriteLine($"\nScore: {score}");
                 Console.WriteLine("\nPress Enter to hide words or type 'quit' to exit.");
                 
                 string input = Console.ReadLine();
                 if (input.ToLower() == "quit")
+                {
+                    stopwatch.Stop();
                     return;
+                }
                 
                 scripture.HideRandomWords(2);
+                score += 10;
             }
 
+            stopwatch.Stop();
             Console.Clear();
             Console.WriteLine(scripture.GetDisplayText());
-            Console.WriteLine("\nCongratulations! You have hidden the entire scripture.");
+            Console.WriteLine($"\nCongratulations! You have hidden the entire scripture.");
+            Console.WriteLine($"Final Score: {score}");
+            Console.WriteLine($"Time Taken: {stopwatch.Elapsed.TotalSeconds} seconds");
             Console.WriteLine("Press Enter to restart or type 'quit' to exit.");
             
             string restartInput = Console.ReadLine();
@@ -34,6 +46,8 @@ class Program
                 return;
             
             scripture.ResetWords();
+            score = 0;
+            stopwatch.Restart();
         }
     }
 }
