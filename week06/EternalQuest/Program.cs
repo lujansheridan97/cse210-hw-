@@ -143,3 +143,115 @@ public class Program
         }
     }
 }
+
+public abstract class Goal
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public int Points { get; set; }
+
+    public Goal(string name, string description)
+    {
+        Name = name;
+        Description = description;
+    }
+
+    public abstract void RecordEvent();
+    public abstract void DisplayGoal();
+    public abstract string GetStringRepresentation();
+}
+
+public class SimpleGoal : Goal
+{
+    public bool IsComplete { get; set; }
+
+    public SimpleGoal(string name, string description) : base(name, description)
+    {
+        Points = 100;
+        IsComplete = false;
+    }
+
+    public override void RecordEvent()
+    {
+        if (!IsComplete)
+        {
+            IsComplete = true;
+            Console.WriteLine($"Completed: {Name} (+{Points} pts)");
+        }
+        else
+        {
+            Console.WriteLine($"{Name} is already complete.");
+        }
+    }
+
+    public override void DisplayGoal()
+    {
+        string status = IsComplete ? "[X]" : "[ ]";
+        Console.WriteLine($"{status} {Name} - {Description}");
+    }
+
+    public override string GetStringRepresentation()
+    {
+        return $"SimpleGoal,{Name},{Description},{Points},{IsComplete}";
+    }
+}
+
+public class EternalGoal : Goal
+{
+    public EternalGoal(string name, string description) : base(name, description)
+    {
+        Points = 50;
+    }
+
+    public override void RecordEvent()
+    {
+        Console.WriteLine($"Recorded: {Name} (+{Points} pts)");
+    }
+
+    public override void DisplayGoal()
+    {
+        Console.WriteLine($"[∞] {Name} - {Description}");
+    }
+
+    public override string GetStringRepresentation()
+    {
+        return $"EternalGoal,{Name},{Description},{Points}";
+    }
+}
+
+public class ChecklistGoal : Goal
+{
+    public int TargetCount { get; set; }
+    public int Completed { get; set; }
+
+    public ChecklistGoal(string name, string description, int targetCount) : base(name, description)
+    {
+        TargetCount = targetCount;
+        Completed = 0;
+        Points = 25;
+    }
+
+    public override void RecordEvent()
+    {
+        if (Completed < TargetCount)
+        {
+            Completed++;
+            Console.WriteLine($"Progress: {Name} ({Completed}/{TargetCount}) (+{Points} pts)");
+        }
+        else
+        {
+            Console.WriteLine($"{Name} is already complete.");
+        }
+    }
+
+    public override void DisplayGoal()
+    {
+        string status = Completed >= TargetCount ? "[X]" : "[ ]";
+        Console.WriteLine($"{status} {Name} - {Description} ({Completed}/{TargetCount})");
+    }
+
+    public override string GetStringRepresentation()
+    {
+        return $"ChecklistGoal,{Name},{Description},{TargetCount},{Points},{Completed}";
+    }
+}
